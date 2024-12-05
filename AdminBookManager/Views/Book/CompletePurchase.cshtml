@@ -1,0 +1,26 @@
+﻿@model AdminBookManager.Models.Payment
+
+@{
+    var token = ViewContext.HttpContext.Request.Query["token"]; // Get the token from the query string
+}
+
+<h2>Review Your Payment</h2>
+
+<div class="container">
+    <form id="payment-form" asp-action="CompletePurchase" method="post" class="form-container">
+        @Html.AntiForgeryToken() <!-- Add AntiForgeryToken for CSRF protection -->
+        <!-- Hidden fields to pass payment details -->
+        <input type="hidden" asp-for="BookTitle" />
+        <input type="hidden" asp-for="Price" />
+        <input type="hidden" asp-for="Quantity" />
+        <input type="hidden" asp-for="TotalPrice" />
+
+        <!-- Hidden token field to pass the token along -->
+        <input type="hidden" name="token" value="@token" />
+
+        <!-- Payment Method Selection -->
+        <!-- Payment and form fields are here -->
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Complete Purchase</button>
+    </form>
+</div>

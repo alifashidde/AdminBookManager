@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Book>
+
+@{
+    ViewData["Title"] = "Book List";
+    var token = ViewContext.HttpContext.Request.Query["token"]; // Get the token from the query string
+}
+<h1>Available Books</h1>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-3">
+            <div class="card mb-4 shadow-sm">
+                <img src="@item.ImagePath" alt="@item.Title" class="card-img-top" style="height: 200px; object-fit: cover;" />
+                <div class="card-body">
+                    <h5 class="card-title">@item.Title</h5>
+                    <p class="card-text">@item.Description</p>
+                    <p class="card-text"><small class="text-muted">Author: @item.Author</small></p>
+                    <p class="card-text"><small class="text-muted">Genre: @item.Genre</small></p>
+                    <p class="card-text"><small class="text-muted">ISBN: @item.ISBN</small></p>
+                    <p class="card-text"><strong>Price: @item.Price.ToString("C")</strong></p>
+                    <!-- View Details Button with Token -->
+                    <a asp-controller="Book" asp-action="Details" asp-route-id="@item.Id" asp-route-token="@token" class="btn btn-info">View Details</a>
+                    <!-- Buy Now Button with Token -->
+                    <a asp-controller="Book" asp-action="Details" asp-route-id="@item.Id" asp-route-token="@token" class="btn btn-success">Buy Now</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,115 @@
+﻿@model AdminBookManager.Models.Payment
+
+@{
+    var token = ViewContext.HttpContext.Request.Query["token"]; // Get the token from the query string
+}
+
+<h2>Review Your Payment</h2>
+
+<div class="container">
+    <form id="payment-form" asp-action="CompletePurchase" method="post" class="form-container">
+        @Html.AntiForgeryToken() <!-- Add AntiForgeryToken for CSRF protection -->
+
+        <!-- Hidden fields to pass payment details -->
+        <input type="hidden" asp-for="BookTitle" />
+        <input type="hidden" asp-for="Price" />
+        <input type="hidden" asp-for="Quantity" />
+        <input type="hidden" asp-for="TotalPrice" />
+
+        <!-- Hidden token field to pass the token along -->
+        <input type="hidden" name="token" value="@token" />
+
+        <!-- Display Book Title -->
+        <div class="form-group">
+            <label>Book Title:</label>
+            <p class="form-value">@Model.BookTitle</p>
+        </div>
+
+        <!-- Display Price per Unit -->
+        <div class="form-group">
+            <label>Price per Unit:</label>
+            <p class="form-value">$@Model.Price</p>
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-group">
+            <label>Quantity:</label>
+            <p class="form-value">@Model.Quantity</p>
+        </div>
+
+        <!-- Total Price -->
+        <div class="form-group">
+            <label>Total Price:</label>
+            <p class="form-value total-price">$@Model.TotalPrice</p>
+        </div>
+
+        <!-- Payment Method Selection -->
+        <div class="form-group">
+            <label for="PaymentMethod">Select Payment Method:</label>
+            <div class="payment-methods">
+                <label>
+                    <input type="radio" asp-for="PaymentMethod" value="Visa" required />
+                    <span class="payment-option">Visa</span>
+                </label>
+                <label>
+                    <input type="radio" asp-for="PaymentMethod" value="Mastercard" required />
+                    <span class="payment-option">Mastercard</span>
+                </label>
+                <label>
+                    <input type="radio" asp-for="PaymentMethod" value="AmericanExpress" required />
+                    <span class="payment-option">American Express</span>
+                </label>
+            </div>
+            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+        </div>
+
+        <!-- Stripe Card Details Input -->
+        <div class="form-group">
+            <label for="CardDetails">Card Details:</label>
+            <div id="card-element">
+                <!-- Stripe Element will be inserted here -->
+            </div>
+            <div id="card-errors" role="alert" class="text-danger mt-2"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Complete Purchase</button>
+    </form>
+</div>
+
+<!-- Include Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+    var stripe = Stripe('pk_test_51P0icNKgFbhot7e2S1zvCZxuLVXlNDn0gCMaQqWZWEnQ0Wor7i0DIiBj8AgOzey7gCzhcmkRRqGf1NOoTrxpgp1p00oeTVynjV');
+    var elements = stripe.elements();
+    var card = elements.create('card');
+    card.mount('#card-element');
+
+    var form = document.getElementById('payment-form');
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const { token, error } = await stripe.createToken(card);
+
+        if (error) {
+            document.getElementById('card-errors').textContent = error.message;
+        } else {
+            var tokenInput = document.createElement('input');
+            tokenInput.setAttribute('type', 'hidden');
+            tokenInput.setAttribute('name', 'PaymentToken');
+            tokenInput.setAttribute('value', token.id);
+            form.appendChild(tokenInput);
+
+            // Adding the existing token from the query string
+            var existingTokenInput = document.createElement('input');
+            existingTokenInput.setAttribute('type', 'hidden');
+            existingTokenInput.setAttribute('name', 'token');
+            existingTokenInput.setAttribute('value', '@token');
+            form.appendChild(existingTokenInput);
+
+            form.submit();
+        }
+    });
+</script>

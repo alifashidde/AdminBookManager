@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Book List";
+    var token = ViewContext.HttpContext.Request.Query["token"];
+}
+
+<h1>Book List</h1>
+
+<a asp-controller="Book" asp-action="Create" asp-route-token="@token" class="btn btn-success mb-3">Create Book</a>
+<li><a href="@Url.Action("Books", "Book", new { token = token })">View Books</a></li>
+
+<a href="https://localhost:7206/Account/ManageUsers?token=@token" class="btn btn-primary">Go to User Management</a>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-3">
+            <div class="card mb-4 shadow-sm">
+                <img src="@item.ImagePath" alt="@item.Title" class="card-img-top" style="height: 200px; object-fit: cover;" />
+                <div class="card-body">
+                    <h5 class="card-title">@item.Title</h5>
+                    <p class="card-text">@item.Description</p>
+                    <p class="card-text"><small class="text-muted">Author: @item.Author</small></p>
+                    <p class="card-text"><small class="text-muted">Genre: @item.Genre</small></p>
+                    <p class="card-text"><small class="text-muted">ISBN: @item.ISBN</small></p>
+                    <p class="card-text"><strong>Price: @item.Price.ToString("C")</strong></p>
+                    <a asp-controller="Book" asp-action="ViewDetails" asp-route-id="@item.Id" asp-route-token="@token" class="btn btn-info">View Details</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .book-list {
+        display: flex;
+        flex-wrap: wrap; /* Allows items to wrap to the next line if needed */
+        gap: 20px; /* Adds space between items */
+    }
+
+    .book-item {
+        border: 1px solid #ccc; /* Optional: adds a border around each book item */
+        padding: 10px;
+        width: 200px; /* Set a fixed width or use a percentage */
+        text-align: center; /* Centers the text inside each item */
+        border-radius: 5px; /* Optional: adds rounded corners */
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Optional: adds a subtle shadow for depth */
+    }
+</style>

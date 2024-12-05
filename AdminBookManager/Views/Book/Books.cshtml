@@ -1,0 +1,40 @@
+﻿@model IEnumerable<AdminBookManager.Models.Book>
+
+@{
+    var token = ViewContext.HttpContext.Request.Query["token"];
+}
+
+<h2>Books</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+                <td>@book.Genre</td>
+                <td>@book.Price.ToString("C")</td>
+                <td>@book.Stock</td>
+                <td>
+                    <!-- Edit Link with Token -->
+                    <a href="@Url.Action("Edit", "Book", new { id = book.Id, token = token })" class="btn btn-warning">Edit</a>
+
+                    <!-- Delete Form with Token -->
+                    <a href="@Url.Action("Delete", "Book", new { id = book.Id, token = token })" class="btn btn-warning">Delete</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
